@@ -1,0 +1,13 @@
+# Ignore les fichiers de cache Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Ignore les fichiers et répertoires spécifiques à l'environnement virtuel
+env/
+venv/
+
+# Ignore les fichiers de configuration d'IDE
+.idea/
+.vscode/

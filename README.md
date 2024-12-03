@@ -18,3 +18,25 @@ A FastAPI-based REST API for managing restaurant operations, including menu item
 
 ## Project Structure
 
+## Running the Project with Docker
+
+To run the project using Docker, follow these steps:
+
+1. **Build and start the containers**:
+
+   ```bash
+   docker-compose up --build
+
+Access the API documentation:
+
+Once the containers are running, you can access the API documentation at:
+
+http://localhost:8000/docs
+
+
+2. **Stop the containers**:
+
+   ```bash
+   docker-compose down
+
+
