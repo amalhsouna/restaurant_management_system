@@ -1,15 +1,18 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
+from sqlalchemy.orm import Session
+from ..database import get_db
 from ..models.order import Order
-from ..schemas.order import OrderCreate
+from ..schemas.order import OrderCreate, OrderResponse
 
 router = APIRouter()
 
-@router.get("/")
-async def get_orders():
-    # Logique pour récupérer toutes les commandes
-    return {"orders": []}
+
+@router.get("/", response_model=list[OrderResponse])
+async def get_orders(db: Session = Depends(get_db)):
+    orders = db.query(Order).all()
+    return orders
+
 
 @router.post("/")
 async def create_order(order: OrderCreate):
-    # Logique pour créer une commande
     return {"message": "Commande créée"}
