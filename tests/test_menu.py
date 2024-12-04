@@ -7,7 +7,7 @@ client = TestClient(app)
 def test_create_menu():
     # Create a menu
     response = client.post(
-        "/menu/",
+        "/menus/",
         json={"name": "Temporary", "description": "Test menu."},
     )
     # Assert that the response status code is 201 (Created)
@@ -23,7 +23,7 @@ def test_create_menu():
 
 def test_get_menus():
     # Get the list of menus
-    response = client.get("/menu/")
+    response = client.get("/menus/")
     # Assert that the response status code is 200 (OK)
     assert response.status_code == 200
     # Assert that the list of menus is not empty

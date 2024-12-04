@@ -6,12 +6,12 @@ import os
 
 
 url_object = URL.create(
-        "postgresql+psycopg2",
-        username=os.getenv("DB_USERNAME"),
-        password=os.getenv("DB_PASSWORD"),
-        host=os.getenv("DB_HOST"),
-        database=os.getenv("DB_NAME"),
-    )
+    "postgresql+psycopg2",
+    username=os.getenv("DB_USERNAME"),
+    password=os.getenv("DB_PASSWORD"),
+    host=os.getenv("DB_HOST"),
+    database=os.getenv("DB_NAME"),
+)
 
 # URL connexion with dataBase
 DATABASE_URL = url_object
@@ -22,6 +22,7 @@ engine = create_engine(DATABASE_URL)
 Base = declarative_base()
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
 
 # Function to get a session from the DB
 def get_db():

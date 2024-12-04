@@ -1,18 +1,19 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 
 
-class UserCreate(BaseModel):
+# schema to validate user
+class UserBase(BaseModel):
     username: str
-    email: str
-
-    class Config:
-        from_attributes = True
+    email: EmailStr
 
 
-class UserResponse(BaseModel):
+class UserCreate(UserBase):
+    pass
+
+
+# add id to get user
+class UserResponse(UserBase):
     id: int
-    username: str
-    email: str
 
     class Config:
-        from_attributes = True
+        orm_mode = True
