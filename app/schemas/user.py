@@ -5,6 +5,7 @@ from pydantic import BaseModel, EmailStr
 class UserBase(BaseModel):
     username: str
     email: EmailStr
+    password: str
 
 
 class UserCreate(UserBase):
@@ -17,3 +18,7 @@ class UserResponse(UserBase):
 
     class Config:
         orm_mode = True
+
+
+class UserInDB(UserBase):
+    hashed_password: str
