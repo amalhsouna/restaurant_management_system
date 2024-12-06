@@ -11,7 +11,7 @@ class OrderResponse(BaseModel):
 
 class OrderCreate(BaseModel):
     user_id: int
-    dish_id: int
+    menu_id: int
     status: str
 
     class Config:

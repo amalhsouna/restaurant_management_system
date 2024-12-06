@@ -3,9 +3,10 @@ from logging.config import fileConfig
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 from alembic import context
-from app.database import Base  # Chemin vers la base SQLAlchemy
-from app.models.users import User  # Importez tous les modèles définis
-from app.models.order import Order  # Si vous avez d'autres modèl
+from app.database import Base  # Path to SQLAlchemy database
+from app.models.users import User  
+from app.models.order import Order  
+from app.models.menu import Menu  
 
 # Configurer le fichier de configuration
 config = context.config

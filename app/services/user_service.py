@@ -13,10 +13,7 @@ def create_user_service(user: UserCreate, db: Session) -> User:
         )
 
     # Create and save a new user
-    new_user = User(
-        username=user.username,
-        email=user.email,
-    )
+    new_user = User(username=user.username, email=user.email, password=user.password)
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
