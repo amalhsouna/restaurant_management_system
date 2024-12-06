@@ -1,47 +1,55 @@
 from fastapi import Depends, HTTPException, status, APIRouter
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
-from typing import List
+from pydantic import BaseModel
 from app.database import get_db
 from app.auth import create_access_token, decode_access_token
 from app.models.users import User
 from app.schemas.token import Token, TokenData
+from bcrypt import checkpw
+from fastapi.security import OAuth2PasswordBearer
+import logging
 
 router = APIRouter()
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
-# Exemple de base de données fictive
-fake_users_db = {
-    "johndoe": {
-        "username": "johndoe",
-        "hashed_password": "fakehashedpassword",  # Hash fictif
-    }
-}
+# Schéma pour le login
+class LoginRequest(BaseModel):
+    username: str
+    password: str
 
 
-# Fonction pour valider un utilisateur à partir de la base fictive
-def get_user_from_db(username: str):
-    return fake_users_db.get(username)
-
-
-@router.post("/", response_model=Token)
+@router.post("/token", response_model=Token)
 async def login_for_access_token(
-    form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)
+    login_data: LoginRequest, db: Session = Depends(get_db)
 ):
-    user = get_user_from_db(form_data.username)
-    if not user or user["hashed_password"] != form_data.password:
+    # Recherche de l'utilisateur dans la base de données
+    user = db.query(User).filter(User.username == login_data.username).first()
+    if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid credentials",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    access_token = create_access_token(data={"sub": user["username"]})
+
+    # Vérification du mot de passe haché
+    if not checkpw(login_data.password.encode("utf-8"), user.password.encode("utf-8")):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    # Création du token JWT
+    access_token = create_access_token(data={"sub": user.username})
+    logging.debug(f"Access token created for user: {user.username}")
     return {"access_token": access_token, "token_type": "bearer"}
 
 
 # Dépendance pour vérifier le token JWT
-def get_current_user(token: str = Depends(oauth2_scheme)):
+def get_current_user(
+    token: str = Depends(OAuth2PasswordBearer(tokenUrl="/token")),
+    db: Session = Depends(get_db),
+):
     payload = decode_access_token(token)
     if payload is None:
         raise HTTPException(
@@ -49,7 +57,24 @@ def get_current_user(token: str = Depends(oauth2_scheme)):
             detail="Invalid token",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    return TokenData(username=payload.get("sub"))
+
+    username = payload.get("sub")
+    if not username:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid token",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    user = db.query(User).filter(User.username == username).first()
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="User not found",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    return TokenData(username=user.username)
 
 
 # Route protégée

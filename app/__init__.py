@@ -1,3 +1,9 @@
 from dotenv import load_dotenv
+import os
 
-load_dotenv()
+print("TESTING value:", os.getenv("TESTING"))
+
+if os.getenv("TESTING", "false").lower() == "true":
+    load_dotenv(".env_test")
+else:
+    load_dotenv()
